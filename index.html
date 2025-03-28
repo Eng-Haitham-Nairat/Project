@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Robot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* لجعل الصفحة كلها في المنتصف */
+            flex-direction: column; /* ترتيب العناصر عموديًا */
+            text-align: center;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        #warning {
+            color: red;
+            font-size: 12px;
+            display: none;
+        }
+        #requestBtn {
+            display: none;
+            margin-top: 20px;
+            padding: 20px 40px; /* تكبير الزر */
+            font-size: 20px; /* تكبير الخط داخل الزر */
+            background-color: #4CAF50; /* تغيير لون الزر */
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #requestBtn:hover {
+            background-color: #45a049; /* تغيير اللون عند التمرير فوق الزر */
+        }
+        #usernameInput {
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 20px;
+            width: 200px;
+        }
+        .error {
+            border: 2px solid red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Delivery Robot</h1>
+    
+    <input type="text" id="usernameInput" placeholder="Enter Username" oninput="checkUsername()" />
+    <div id="warning">This user is not registered in the database.</div>
+    <button id="requestBtn" onclick="sendLocation()">اطلب الآن</button>
+    
+    <script>
+        let ws = new WebSocket("ws://192.168.1.15:81"); // ضع هنا IP الـ ESP32
+        let requestBtn = document.getElementById('requestBtn');
+        let usernameInput = document.getElementById('usernameInput');
+        let warningMessage = document.getElementById('warning');
+
+        // وظيفة للتحقق من اسم المستخدم
+        function checkUsername() {
+            let username = usernameInput.value;
+
+            // إذا كان الاسم Haitham
+            if (username === "Haitham") {
+                requestBtn.style.display = "block";  // إظهار الزر
+                warningMessage.style.display = "none"; // إخفاء التحذير
+                usernameInput.classList.remove("error"); // إزالة حدود الخطأ
+            } else {
+                requestBtn.style.display = "none"; // إخفاء الزر
+                warningMessage.style.display = "block"; // عرض التحذير
+                usernameInput.classList.add("error"); // إضافة حدود خطأ حمراء
+            }
+        }
+
+        // إرسال الموقع عندما يتم الضغط على "اطلب الآن"
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    let locationString = lat + "," + lon;
+
+                    // إرسال الإحداثيات عبر WebSocket
+                    ws.send(locationString);
+                    alert("تم إرسال موقعك: " + locationString);
+                });
+            } else {
+                alert("المتصفح لا يدعم تحديد الموقع.");
+            }
+        }
+    </script>
+</body>
+</html>
