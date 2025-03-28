@@ -58,7 +58,7 @@
     <button id="requestBtn" onclick="sendLocation()">اطلب الآن</button>
     
     <script>
-        let ws = new WebSocket("ws://192.168.1.15:81"); // ضع هنا IP الـ ESP32
+        let ws = new WebSocket("http://192.168.1.15:81"); // ضع هنا IP الـ ESP32
         let requestBtn = document.getElementById('requestBtn');
         let usernameInput = document.getElementById('usernameInput');
         let warningMessage = document.getElementById('warning');
